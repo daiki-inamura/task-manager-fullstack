@@ -1,38 +1,35 @@
 import { useEffect, useState } from 'react'
 
 type Task = {
-  id: number
-  title: string
-  completed: boolean
+  id: number;
+  title: string;
+  description: string;
 };
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/tasks')
-      .then(response => {
-        if (!response.ok) 
-          throw new Error(response.statusText);
-          return response.json();  
-      })
-      .then((data: Task[]) => setTasks(data))
-      .catch(error => setError(error.message));
+    fetch('http://localhost:3000/tasks')
+    .then(res => res.json())
+    .then(data => setTasks(data))
+    .catch(error => console.error('Error fetching tasks:', error));
   }, []);
 
-  if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
-
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Tasks</h1>
-      <ul className="mt-4 list-disc pl-5">
-        {tasks.map(t => (
-          <li key={t.id}>
-            #{t.id} {t.title} [{t.completed ? '✓' : '–'}]
-          </li>
-        ))}
-      </ul>
+    <div>
+      <h1>タスク一覧</h1>
+      {tasks.length === 0 ? (
+        <p>タスクがありません。</p>
+      ) : (
+        <ul>
+          {tasks.map(task => (
+            <li key={task.id}>
+              <strong>{task.title}</strong>: {task.description}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
